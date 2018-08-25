@@ -71,7 +71,7 @@ def parse_shp_for_geom_and_tags( filename ):
         tags["tiger:way_id"] = int( poFeature.GetField("TLID") )
         
         # FEATURE IDENTIFICATION
-        mtfcc = poFeature.GetField("MTFCC");
+        mtfcc = poFeature.GetField("MTFCC")
         if mtfcc != None:
 
             if mtfcc == "L4010":        #Pipeline
@@ -259,7 +259,7 @@ def addressways(waylist, nodelist, first_id):
         for segment in segments:
             lsegment = []
             rsegment = []
-            lastpoint = None
+            lastpoint = []
 
             # Don't pull back the ends of very short ways too much
             seglength = length(segment, nodelist)
@@ -304,7 +304,7 @@ def addressways(waylist, nodelist, first_id):
                     lon_feet = 365527.822 * math.cos(lrad) - 306.75853 * math.cos(3 * lrad) + 0.3937 * math.cos(5 * lrad)
 
 #Calculate the points of the offset ways
-                    if lastpoint != None:
+                    if not lastpoint:
                         #Skip points too close to start
                         if math.sqrt((lat * lat_feet - firstpoint[0] * lat_feet)**2 + (lon * lon_feet - firstpoint[1] * lon_feet)**2) < pullback:
                             #Preserve very short ways (but will be rendered backwards)
@@ -369,7 +369,7 @@ def addressways(waylist, nodelist, first_id):
 
                         delta = (Yp, Xp)
 
-                    lastpoint = (lat, lon)
+                    lastpoint = list(lat, lon)
 
 
 #Add in the last node
@@ -404,11 +404,11 @@ def addressways(waylist, nodelist, first_id):
 
 #Write the nodes of the offset ways
                 if right:
-                    rlinestring = [];
+                    rlinestring = []
                     for i, point in rsegment:
                         rlinestring.append( "%f %f" % (point[1], point[0]) )
                 if left:
-                    llinestring = [];
+                    llinestring = []
                     for i, point in lsegment:
                         llinestring.append( "%f %f" % (point[1], point[0]) )
                 if right:
@@ -438,18 +438,18 @@ def addressways(waylist, nodelist, first_id):
                 if right:
                     id += 1
 
-                    interpolationtype = "all";
+                    interpolationtype = "all"
                     if rtofromint:
                         if (rfromint % 2) == 0 and (rtoint % 2) == 0:
                             if separated == "Y":        #Doesn't matter if there is another side
-                                interpolationtype = "even";
+                                interpolationtype = "even"
                             elif ltofromint and (lfromint % 2) == 1 and (ltoint % 2) == 1:
-                                interpolationtype = "even";
+                                interpolationtype = "even"
                         elif (rfromint % 2) == 1 and (rtoint % 2) == 1:
                             if separated == "Y":        #Doesn't matter if there is another side
-                                interpolationtype = "odd";
+                                interpolationtype = "odd"
                             elif ltofromint and (lfromint % 2) == 0 and (ltoint % 2) == 0:
-                                interpolationtype = "odd";
+                                interpolationtype = "odd"
 
                     ret.append( "SELECT tiger_line_import(ST_GeomFromText('LINESTRING(%s)',4326), %s, %s, %s, %s, %s, %s);" %
                                 ( ",".join(rlinestring), sql_quote(rfromadd), sql_quote(rtoadd), sql_quote(interpolationtype), sql_quote(name), sql_quote(county), sql_quote(zipr) ) )
@@ -457,18 +457,18 @@ def addressways(waylist, nodelist, first_id):
                 if left:
                     id += 1
 
-                    interpolationtype = "all";
+                    interpolationtype = "all"
                     if ltofromint:
                         if (lfromint % 2) == 0 and (ltoint % 2) == 0:
                             if separated == "Y":
-                                interpolationtype = "even";
+                                interpolationtype = "even"
                             elif rtofromint and (rfromint % 2) == 1 and (rtoint % 2) == 1:
-                                interpolationtype = "even";
+                                interpolationtype = "even"
                         elif (lfromint % 2) == 1 and (ltoint % 2) == 1:
                             if separated == "Y":
-                                interpolationtype = "odd";
+                                interpolationtype = "odd"
                             elif rtofromint and (rfromint %2 ) == 0 and (rtoint % 2) == 0:
-                                interpolationtype = "odd";
+                                interpolationtype = "odd"
 
                     ret.append( "SELECT tiger_line_import(ST_GeomFromText('LINESTRING(%s)',4326), %s, %s, %s, %s, %s, %s);" %
                                 ( ",".join(llinestring), sql_quote(lfromadd), sql_quote(ltoadd), sql_quote(interpolationtype), sql_quote(name), sql_quote(county), sql_quote(zipl) ) )
